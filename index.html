@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thaddeus Lim - Documents</title>
+<meta name="description" content="Documents and files shared by Thaddeus Lim.">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:  #E7EAE4;
+    --sheet:  #FBFCFA;
+    --ink:    #1F2A26;
+    --muted:  #5E6B64;
+    --rule:   #CBD2C9;
+    --accent: #2E5F4C;
+    --tint:   #DDE5E0;
+    --warn:   #A24630;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:  #171C1A;
+      --sheet:  #1E2422;
+      --ink:    #E4E9E4;
+      --muted:  #96A29B;
+      --rule:   #333D38;
+      --accent: #8FC4AC;
+      --tint:   #26302B;
+      --warn:   #E0917A;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 43rem;
+    margin: 0 auto;
+    padding: clamp(3rem, 10vw, 6.5rem) clamp(1.25rem, 5vw, 2rem) 6rem;
+  }
+
+  .name {
+    font-family: Newsreader, Georgia, "Times New Roman", serif;
+    font-weight: 300;
+    font-size: clamp(2.75rem, 9vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .lede {
+    max-width: 34ch;
+    margin: 1.25rem 0 0;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+
+  .shelf { margin-top: clamp(3rem, 8vw, 4.5rem); }
+  .shelf + .shelf { margin-top: clamp(2.75rem, 7vw, 4rem); }
+
+  .shelf-name {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    margin: 0 0 0.25rem;
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .stack { list-style: none; margin: 0; padding: 0; }
+
+  .doc {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr auto;
+    column-gap: 1rem;
+    padding: 1.375rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .kind {
+    grid-column: 1;
+    align-self: start;
+    justify-self: start;
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--tint);
+    border-radius: 2px;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .body { grid-column: 2; min-width: 0; }
+
+  .title {
+    font-family: Newsreader, Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 1.375rem;
+    line-height: 1.25;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .title:hover,
+  .title:focus-visible {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .note {
+    margin: 0.375rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--muted);
+    max-width: 52ch;
+  }
+
+  .flag {
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--warn);
+    white-space: nowrap;
+  }
+
+  .doc[data-missing="yes"] .title {
+    color: var(--muted);
+    border-bottom-style: dotted;
+  }
+
+  .share {
+    grid-column: 3;
+    align-self: start;
+    margin-top: 0.2rem;
+    font: inherit;
+    font-size: 0.8125rem;
+    color: var(--muted);
+    background: none;
+    border: 0;
+    padding: 0.35rem 0;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .share:hover, .share:focus-visible { color: var(--accent); }
+  .share[data-copied="yes"] { color: var(--accent); }
+
+  .empty {
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.5rem;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    margin-top: 3rem;
+  }
+
+  .empty code { color: var(--ink); font-size: 0.875em; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 34rem) {
+    .doc { grid-template-columns: 1fr auto; row-gap: 0.5rem; }
+    .kind { grid-column: 1; grid-row: 1; margin-top: 0; }
+    .body { grid-column: 1 / -1; grid-row: 2; }
+    .share { grid-column: 2; grid-row: 1; margin-top: 0; }
+  }
+</style>
+</head>
+<body>
+
+<main class="page">
+  <h1 class="name">Thaddeus Lim</h1>
+  <p class="lede">Files I've made public. Open one to read it, or copy its link to send on.</p>
+  <div id="index"></div>
+</main>
+
+<script>
+  /* ============================================================
+     YOUR DOCUMENTS - edit this list.
+
+       title : what people see
+       file  : path to the file, relative to this page
+       note  : optional one-line description
+       shelf : optional heading to group under
+
+     Paths are case-sensitive once published. "Resume.PDF" and
+     "resume.pdf" are different files on most web hosts.
+     ============================================================ */
+
+  const DOCUMENTS = [
+    {
+      title: "CS3244 project proposal",
+      file: "cs3244-proposal.html",
+      note: "Group 15. Credit scoring: label sensitivity, scorecard versus boosting, fairness audit.",
+      shelf: "Coursework"
+    }
+  ];
+
+  /* ---- rendering: you shouldn't need to change anything below ---- */
+
+  const mount = document.getElementById("index");
+
+  const kindOf = (path) => {
+    const clean = path.split(/[?#]/)[0];
+    const bits = clean.split(".");
+    return bits.length > 1 ? bits.pop().toLowerCase() : "file";
+  };
+
+  const copyText = async (text) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+    const pad = document.createElement("textarea");
+    pad.value = text;
+    pad.setAttribute("readonly", "");
+    pad.style.position = "fixed";
+    pad.style.opacity = "0";
+    document.body.append(pad);
+    pad.select();
+    const ok = document.execCommand("copy");
+    pad.remove();
+    return ok;
+  };
+
+  /* Warns you if a listed file isn't actually there. Only runs on a
+     published site; a local file:/// page can't check its neighbours. */
+  const checkFile = async (row, link) => {
+    if (location.protocol !== "http:" && location.protocol !== "https:") return;
+    let res;
+    try {
+      res = await fetch(link.href, { method: "HEAD" });
+    } catch {
+      return;
+    }
+    if (res.ok) return;
+    row.dataset.missing = "yes";
+    const flag = document.createElement("span");
+    flag.className = "flag";
+    flag.textContent = "file not found";
+    link.after(flag);
+  };
+
+  const buildDoc = (doc) => {
+    const row = document.createElement("li");
+    row.className = "doc";
+
+    const kind = document.createElement("span");
+    kind.className = "kind";
+    kind.textContent = kindOf(doc.file);
+    row.append(kind);
+
+    const body = document.createElement("div");
+    body.className = "body";
+
+    const link = document.createElement("a");
+    link.className = "title";
+    link.href = doc.file;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = doc.title;
+    body.append(link);
+
+    if (doc.note) {
+      const note = document.createElement("p");
+      note.className = "note";
+      note.textContent = doc.note;
+      body.append(note);
+    }
+    row.append(body);
+
+    const share = document.createElement("button");
+    share.className = "share";
+    share.type = "button";
+    share.textContent = "Copy link";
+    share.addEventListener("click", async () => {
+      const url = new URL(doc.file, location.href).href;
+      let ok = false;
+      try { ok = await copyText(url); } catch { ok = false; }
+      if (!ok) window.prompt("Copy this link:", url);
+      share.textContent = ok ? "Copied" : "Copy link";
+      share.dataset.copied = "yes";
+      setTimeout(() => {
+        share.textContent = "Copy link";
+        delete share.dataset.copied;
+      }, 1800);
+    });
+    row.append(share);
+
+    checkFile(row, link);
+    return row;
+  };
+
+  const render = () => {
+    if (!Array.isArray(DOCUMENTS) || DOCUMENTS.length === 0) {
+      mount.innerHTML =
+        '<p class="empty">No files yet. Add your first one to the ' +
+        '<code>DOCUMENTS</code> list near the bottom of index.html.</p>';
+      return;
+    }
+
+    const shelves = new Map();
+    for (const doc of DOCUMENTS) {
+      const key = doc.shelf || "Documents";
+      if (!shelves.has(key)) shelves.set(key, []);
+      shelves.get(key).push(doc);
+    }
+
+    for (const [name, docs] of shelves) {
+      const section = document.createElement("section");
+      section.className = "shelf";
+
+      const heading = document.createElement("h2");
+      heading.className = "shelf-name";
+      heading.textContent = name;
+      section.append(heading);
+
+      const stack = document.createElement("ul");
+      stack.className = "stack";
+      docs.forEach((doc) => stack.append(buildDoc(doc)));
+      section.append(stack);
+
+      mount.append(section);
+    }
+  };
+
+  render();
+</script>
+
+</body>
+</html>
