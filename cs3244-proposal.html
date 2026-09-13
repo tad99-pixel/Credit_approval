@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS3244 Project Proposal — Credit Card Approval Prediction</title>
+<meta name="description" content="Group 15 project proposal: deciding what counts as a bad client in credit scoring and classifying future ones.">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:  #E7EAE4;
+    --sheet:  #FBFCFA;
+    --ink:    #1F2A26;
+    --muted:  #5E6B64;
+    --rule:   #CBD2C9;
+    --accent: #2E5F4C;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:  #171C1A;
+      --sheet:  #1E2422;
+      --ink:    #E4E9E4;
+      --muted:  #96A29B;
+      --rule:   #333D38;
+      --accent: #8FC4AC;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: clamp(2.5rem, 8vw, 5rem) clamp(1.25rem, 5vw, 2rem) 6rem;
+  }
+
+  /* ---- masthead ---- */
+
+  .meta {
+    font-size: 0.8125rem;
+    color: var(--muted);
+    margin: 0 0 1.25rem;
+  }
+
+  .meta span + span::before {
+    content: "/";
+    margin: 0 0.5rem;
+    color: var(--rule);
+  }
+
+  h1 {
+    font-family: Newsreader, Georgia, serif;
+    font-weight: 300;
+    font-size: clamp(2rem, 5.5vw, 3.125rem);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 0;
+    max-width: 20ch;
+  }
+
+  .dataset {
+    margin: 1.75rem 0 0;
+    padding: 1.25rem 1.375rem;
+    background: var(--sheet);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 3px 3px 0;
+  }
+
+  .dataset p { margin: 0; font-size: 0.9375rem; }
+  .dataset p + p { margin-top: 0.75rem; }
+  .dataset .caption {
+    color: var(--muted);
+    font-size: 0.8125rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ---- sections ---- */
+
+  section { margin-top: clamp(2.75rem, 7vw, 4rem); }
+
+  h2 {
+    font-family: Newsreader, Georgia, serif;
+    font-weight: 400;
+    font-size: 1.625rem;
+    line-height: 1.2;
+    margin: 0 0 1rem;
+    padding-bottom: 0.625rem;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  h3 {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    margin: 2rem 0 0.5rem;
+    color: var(--accent);
+  }
+
+  p { max-width: 68ch; margin: 0 0 1rem; }
+
+  strong { font-weight: 500; }
+
+  em { font-style: italic; }
+
+  /* ---- numbered lists that are genuinely ordered ---- */
+
+  ol.questions, ol.approach {
+    list-style: none;
+    counter-reset: item;
+    margin: 0;
+    padding: 0;
+  }
+
+  ol.questions > li, ol.approach > li {
+    counter-increment: item;
+    position: relative;
+    padding: 0 0 1.5rem 2.75rem;
+  }
+
+  ol.questions > li::before, ol.approach > li::before {
+    content: counter(item);
+    position: absolute;
+    left: 0;
+    top: 0.05rem;
+    width: 1.75rem;
+    text-align: center;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 11%, transparent);
+    border-radius: 2px;
+    padding: 0.1rem 0;
+  }
+
+  ol.questions > li > p:first-of-type { font-weight: 500; }
+
+  ol.approach > li > p:first-of-type { font-weight: 500; }
+
+  ul { margin: 0 0 1rem; padding-left: 1.125rem; max-width: 68ch; }
+  li { margin-bottom: 0.375rem; }
+
+  /* ---- outcome tiers ---- */
+
+  .tier {
+    background: var(--sheet);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.25rem 1.375rem;
+    margin-bottom: 1rem;
+  }
+
+  .tier h3 { margin-top: 0; }
+  .tier p:last-child { margin-bottom: 0; }
+
+  /* ---- schedule ---- */
+
+  .schedule {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+  }
+
+  .schedule th {
+    text-align: left;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--muted);
+    padding: 0 0.75rem 0.625rem 0;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .schedule td {
+    padding: 0.875rem 0.75rem 0.875rem 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  .schedule td:first-child {
+    white-space: nowrap;
+    color: var(--muted);
+    font-size: 0.875rem;
+    width: 1%;
+  }
+
+  .schedule td:last-child {
+    color: var(--muted);
+    font-size: 0.875rem;
+    padding-right: 0;
+  }
+
+  /* ---- resources ---- */
+
+  .stack-list { list-style: none; padding: 0; }
+
+  .stack-list li {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 0.5rem 1rem;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid var(--rule);
+    margin: 0;
+  }
+
+  .stack-list .tool { font-weight: 500; font-size: 0.9375rem; }
+  .stack-list .role { color: var(--muted); font-size: 0.9375rem; }
+
+  .reading { list-style: none; padding: 0; }
+  .reading li {
+    padding-left: 1.125rem;
+    position: relative;
+    margin-bottom: 0.625rem;
+    max-width: 68ch;
+  }
+  .reading li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.4rem;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  a { color: var(--accent); }
+
+  @media (max-width: 34rem) {
+    .stack-list li { grid-template-columns: 1fr; gap: 0.125rem; }
+    .schedule td:last-child { font-size: 0.8125rem; }
+  }
+</style>
+</head>
+<body>
+
+<article class="page">
+
+  <p class="meta"><span>PG Group 15</span><span>CS3244</span><span>Dataset D1.4 — Tabular</span></p>
+
+  <h1>Deciding what counts as a “bad” client in credit scoring, and classifying future ones</h1>
+
+  <div class="dataset">
+    <p class="caption">Credit Card Approval Prediction</p>
+    <p>Kaggle datasets describing 438,510 unique applicants across 18 demographic, socioeconomic and asset-ownership attributes recorded at application, alongside month-by-month delinquency status for 45,985 clients. The 36,457 IDs common to both tables form our modelling set.</p>
+    <p>The source is an anonymised Kaggle upload of undocumented provenance covering only already-approved applicants, so we treat it as realistic but unverifiable and report the resulting selection bias as a limitation.</p>
+  </div>
+
+  <section>
+    <h2>Motivation</h2>
+    <p>Credit scoring decides who gets access to credit, and it is one of the few machine learning applications where the model's output must be defensible to the applicant and to a regulator, not just accurate.</p>
+    <p>Given that the bad-client class is expected to represent only roughly 1–2% of clients, a classifier that predicts “good” for everyone would still achieve very high accuracy while missing nearly all bad clients. These results say almost nothing about risk, and several also apply oversampling before the train/test split, which leaks synthetic minority examples into the test set. There is a real gap here between what gets reported and what has been learned by the model.</p>
+    <p>The problem matters because the two error types are not symmetric. Approving a client who defaults costs the lender money. Rejecting a creditworthy applicant denies someone access to credit, and under adverse-action requirements the lender still has to state a reason, which is difficult with an opaque ensemble. This is not hypothetical in Singapore: MAS co-created the FEAT principles (Fairness, Ethics, Accountability, Transparency) with the industry in 2018, and the first phase of the Veritas initiative concluded in January 2021 with a fairness assessment methodology built specifically around a credit risk scoring use case. Understanding what transparency costs is therefore a real and viable question for us to answer.</p>
+    <p>Three groups benefit. Lenders get evidence on how much discriminatory power they give up for a deployable, explainable scorecard. Applicants benefit from fewer wrongful rejections and from decisions that come with a stated reason. Model risk and validation teams get a worked example of how sensitive their conclusions are to a labelling convention that is usually buried in a preprocessing script.</p>
+  </section>
+
+  <section>
+    <h2>Statement of problem task</h2>
+    <p>Supervised binary classification for consumer credit risk, using applicant attributes recorded at application time to predict subsequent repayment behaviour.</p>
+    <p>Given 36,457 credit card clients described by demographic and socio-economic attributes at application, together with their subsequent month-by-month delinquency history, we want to build and critically evaluate models that separate clients who will repay from clients who will fall seriously behind in their payment. The task is complicated by three issues: the target label does not exist and must be constructed; the positive bad-client class is severely imbalanced, making accuracy an unreliable metric; and the operational value of a model here depends as much on whether its decisions can be explained as on how well it ranks.</p>
+  </section>
+
+  <section>
+    <h2>Key questions</h2>
+    <ol class="questions">
+      <li>
+        <p>How sensitive are our conclusions to how “bad” is defined?</p>
+        <p>Varying the delinquency threshold (ever 30+ / 60+ / 90+ days past due), the performance window (12 / 18 / 24 months on book), and the persistence requirement (a single occurrence versus two consecutive months) produces a family of labels. Do the resulting model rankings, feature importances, and achievable performance stay stable, or do they flip?</p>
+      </li>
+      <li>
+        <p>What does transparency cost?</p>
+        <p>How much discriminatory power (PR-AUC, Kolmogorov–Smirnov) does a more traditional weight-of-evidence (WOE) binned logistic scorecard give up against a tuned gradient boosting model, once both are evaluated under an identical, leakage-free protocol on imbalance-aware metrics?</p>
+      </li>
+      <li>
+        <p>Which applicant attributes carry real signal, and do protected attributes matter?</p>
+        <p>Once legitimate financial features are controlled for, does gender, family status, or number of children add predictive value? Does removing them measurably hurt performance, and does group-level performance stay comparable across age and gender bands?</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>General approach</h2>
+    <ol class="approach">
+      <li>
+        <p>Data preparation</p>
+        <p>Inner-join the two tables on ID and restrict to the 36,457 overlapping clients. Convert <strong>DAYS_BIRTH</strong> and <strong>DAYS_EMPLOYED</strong> to years, isolating the not-employed sentinel as its own indicator rather than letting it distort the distribution. Treat missing <strong>OCCUPATION_TYPE</strong> as an explicit category and test that choice against listwise deletion. Check for and resolve near-duplicate application rows.</p>
+      </li>
+      <li>
+        <p>Label construction via vintage analysis</p>
+        <p>Aggregate <strong>credit_record</strong> per client into a delinquency trajectory, then define the label family described in Question 1. We designate one primary label up front — provisionally, ever 60+ days past due within 18 months on book — and carry the remaining definitions through the full pipeline as a sensitivity grid, so the label experiment is built in rather than bolted on. We define bad = 1 for clients who meet the selected delinquency criterion and good = 0 otherwise. Bad is the positive class; good is the negative class.</p>
+      </li>
+      <li>
+        <p>Feature engineering</p>
+        <p>Two parallel representations: WOE-binned features with information value screening for the scorecard track, and raw plus one-hot encoded features for the tree track. All binning and encoding is fitted inside cross-validation folds.</p>
+      </li>
+      <li>
+        <p>Models, in increasing opacity</p>
+        <p>Majority-class and simple logistic baselines, then a WOE logistic scorecard, penalised logistic regression, random forest, and XGBoost or LightGBM.</p>
+      </li>
+      <li>
+        <p>Explanation and comparison</p>
+        <p>Produce a points table and reason codes from the scorecard, SHAP attributions from the boosting model, and check whether the two agree on which factors drive risk. Disagreement is a result worth reporting.</p>
+      </li>
+      <li>
+        <p>Fairness audit</p>
+        <p>Since bad = 1 is the positive class, a false positive is a wrongful denial of a good client and a false negative is an under-flagged risk. We compare group-wise performance and error rates across gender and age bands, then apply leave-one-out removal of protected attributes and check for proxy leakage after removal.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Evaluation</h2>
+
+    <h3>Protocol</h3>
+    <p>A stratified test set is held out and frozen before any modelling begins, and touched once at the end. Model selection uses repeated 5-fold stratified cross-validation on the training portion. Every preprocessing step that learns from data — imputation, WOE binning, scaling, any resampling — is fitted inside the fold, never before the split. Where <strong>MONTHS_BALANCE</strong> permits, we additionally construct an out-of-time validation split by cohort, since a temporal split is the honest test for a scoring model.</p>
+
+    <h3>Metrics</h3>
+    <ul>
+      <li><strong>Precision-recall AUC</strong> as the primary measure, given the base rate.</li>
+      <li><strong>ROC-AUC and the KS statistic</strong> for comparability with the credit scoring literature.</li>
+      <li><strong>Brier score and calibration curves</strong>, because a scorecard that ranks well but is miscalibrated cannot be used to price risk.</li>
+      <li><strong>Expected cost</strong> under an asymmetric cost matrix, reported as a sensitivity curve across a range of false-negative-to-false-positive cost ratios rather than a single assumed value.</li>
+      <li><strong>Accuracy</strong>, reported only to demonstrate why it is uninformative here.</li>
+    </ul>
+
+    <div class="tier">
+      <h3>Satisfactory outcome (C-level)</h3>
+      <p>A reproducible end-to-end pipeline from raw CSVs to results. At least one clearly documented and defensible label definition. Baseline plus two or three model families compared on imbalance-aware metrics with no leakage. Honest error analysis identifying which applicant segments the models get wrong. A clear statement of the dataset's limitations.</p>
+    </div>
+
+    <div class="tier">
+      <h3>Excellent outcome (A-level)</h3>
+      <p>All of the above, plus: the label-sensitivity question actually answered with evidence, establishing whether model rankings and risk drivers survive a change in labelling convention, with the magnitude quantified. Calibrated probabilities, not just rankings. A deployable points-based scorecard with a working reason-code mechanism, benchmarked against the ensemble, so the cost of transparency is stated as a number. A fairness audit reporting group-wise metrics. And a clear account of what this data <em>cannot</em> support.</p>
+      <p>We want to be explicit that a negative result counts as success. If the transparent scorecard lands within a small margin of the boosting model, that is a finding with real practical weight, not a failed experiment. The accuracy gap, even if it is that small, does not justify losing the interpretability, auditability, deployability, and drift stability that the scorecard gives us.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Resources</h2>
+
+    <h3>Data</h3>
+    <p>The Kaggle dataset is downloaded directly and available at no cost; we will record the licence stated on the dataset page in our report. No additional datasets are required, though we may pull Singapore consumer credit aggregates from MAS or Credit Bureau Singapore publications for context in the motivation section only, not as model inputs.</p>
+
+    <h3>Software</h3>
+    <p>All open source, installed via pip into a pinned virtual environment.</p>
+    <ul class="stack-list">
+      <li><span class="tool">Python 3.11, pandas, numpy</span><span class="role">Data handling</span></li>
+      <li><span class="tool">scikit-learn</span><span class="role">Pipelines, cross-validation, baselines, calibration</span></li>
+      <li><span class="tool">xgboost / lightgbm</span><span class="role">Gradient boosting, including monotone constraints</span></li>
+      <li><span class="tool">optbinning</span><span class="role">WOE binning, information value, scorecard construction (fallback: scorecardpy)</span></li>
+      <li><span class="tool">imbalanced-learn</span><span class="role">SMOTE and related resampling, used inside folds</span></li>
+      <li><span class="tool">shap</span><span class="role">Attribution for the ensemble track</span></li>
+      <li><span class="tool">matplotlib, seaborn</span><span class="role">Figures</span></li>
+      <li><span class="tool">Jupyter, Git</span><span class="role">Private GitHub repository shared with the teaching team</span></li>
+    </ul>
+
+    <h3>Reading</h3>
+    <ul class="reading">
+      <li>Lessmann et al. (2015), for benchmarking methodology</li>
+      <li>Siddiqi, <em>Credit Risk Scorecards</em>, for scorecard construction</li>
+      <li>Kozodoi, Jacob &amp; Lessmann, on fairness in credit scoring</li>
+      <li>Chen &amp; Guestrin (2016), for XGBoost</li>
+      <li>Lundberg &amp; Lee (2017), for SHAP</li>
+      <li>MAS Veritas Document 1, fairness assessment methodology for the credit risk use case</li>
+    </ul>
+    <p>Papers are accessible through the NUS Libraries subscription or open-access preprints; the Veritas whitepapers are free from the MAS website.</p>
+
+    <h3>Strategy</h3>
+    <p>Everything on this list is free and immediately available; no access requests, licences, or data-sharing agreements are needed. The one dependency worth naming is optbinning; if it proves awkward, WOE binning is straightforward to implement directly with pandas, and we have budgeted for that.</p>
+  </section>
+
+  <section>
+    <h2>Schedule</h2>
+    <table class="schedule">
+      <thead>
+        <tr><th scope="col">Dates</th><th scope="col">Milestone</th><th scope="col">Owners</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>14–20 Sep</td>
+          <td>Data downloaded, join validated, EDA v1 (distributions, missingness, duplicates), repo and environment scaffolded</td>
+          <td>‘Afif, Clarence, Thaddeus</td>
+        </tr>
+        <tr>
+          <td>21–27 Sep</td>
+          <td>Vintage analysis; label family defined and locked; test set frozen</td>
+          <td>Darren, Kenneth, Han Jie</td>
+        </tr>
+        <tr>
+          <td>28 Sep – 4 Oct</td>
+          <td>Preprocessing pipeline with in-fold WOE binning; logistic baselines; leakage audit</td>
+          <td>‘Afif, Clarence, Thaddeus</td>
+        </tr>
+        <tr>
+          <td>5–11 Oct</td>
+          <td>Scorecard track complete (binning, IV screening, points table, reason codes)</td>
+          <td>Darren, Kenneth, Han Jie</td>
+        </tr>
+        <tr>
+          <td>12–18 Oct</td>
+          <td>Tree and boosting track; hyperparameter search; first full model × label grid</td>
+          <td>Darren, Kenneth, Han Jie</td>
+        </tr>
+        <tr>
+          <td>19–25 Oct</td>
+          <td>Imbalance experiments and calibration; internal checkpoint and peer review round</td>
+          <td>All</td>
+        </tr>
+        <tr>
+          <td>26 Oct – 1 Nov</td>
+          <td>Fairness audit; SHAP versus scorecard coefficient comparison; out-of-time validation</td>
+          <td>‘Afif, Clarence, Thaddeus</td>
+        </tr>
+        <tr>
+          <td>2–8 Nov</td>
+          <td>All results frozen; error analysis; figures finalised; report and slides drafted</td>
+          <td>All</td>
+        </tr>
+        <tr>
+          <td>9–15 Nov</td>
+          <td>Internal review, code cleanup and reproducibility check, final submission</td>
+          <td>All</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</article>
+
+</body>
+</html>
